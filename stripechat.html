@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stripe Checkout</title>
+    <!-- Ajoutez ici une feuille de style si nécessaire -->
+    <script src="https://js.stripe.com/v3/"></script> <!-- Correctement écrit -->
+</head>
+<body>
+    <button id="checkout">Checkout</button>
+
+    <script>
+        var stripe = Stripe("pk_test_51QScFwRtAPr6M2HeedknIgt3uwMeVeybXuUXnzBylVmO1dLZVjnF7LVamYB7anqQ6NC2ijeM9h9x0PMp8L71JUXt00uOzVXsFO");
+
+        document.getElementById("checkout").addEventListener("click", function() {
+            stripe.redirectToCheckout({
+                lineItems: [
+                    {
+                        price: "price_1QSy3iRtAPr6M2HeKz5QCwEF",  // Remplacez par un ID de prix valide
+                        quantity: 1
+                    }
+                ],
+                mode: "subscription", // Choix du mode de paiement (abonnement)
+                successUrl: "https://www.votre-URL-de-succes.com/",   // Remplacez par une URL valide
+                cancelUrl: "https://www.votre-URL-de-annulation.com/"  // Remplacez par une URL valide
+            }).then(function(result) {
+                if (result.error) {
+                    // Gérer les erreurs
+                    console.error(result.error.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

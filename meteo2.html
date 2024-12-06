@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="meteo2.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body>
+    <main class="main-container">
+        <header class="input-container">
+            <input type="text" name="" id="" class="city-input" placeholder=" Rechercher Ville">
+            <button class="search-btn">
+                <span class="material-symbols-outlined">
+                    search
+                </span>
+            </button>
+        </header>
+        <section class="weather-info" style="display: none;">
+            <div class="location-date-container">
+                <div class="location">
+                    <span class="material-symbols-outlined">
+                        location_on
+                        </span>
+                        <h4 class="country-txt">jakarta</h4>
+                </div>
+                <h5 class="current-date-txt regular-txt">wed,5 Nov</h5>
+            </div>
+            <div class="weather-summary-container">
+                <img src="" alt="" class="weather-summary-img" width="120px" height="120px">
+                <div class="weather-summary-info">
+                    <h1 class="temp-txt">29 °C</h1>
+                    <h3 class="condition-txt regular-txt">Clouds</h3>
+                </div>
+            </div>
+            <div class="weather-conditions-container">
+                <div class="condition-item">
+                    <span class="material-symbols-outlined">
+                        water_drop
+                    </span>
+                    <div class="condition-info">
+                        <h5 class="regular-txt">Humidity</h5>
+                        <h5 class="humidity-value-txt">55%</h5>
+                    </div>
+                </div>
+                <div class="condition-item">
+                    <span class="material-symbols-outlined">
+                        air
+                    </span>
+                    <div class="condition-info">
+                        <h5 class="regular-txt">Wind Speed</h5>
+                        <h5 class="wind-value-txt">2 M/s</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="forecast-items-container">
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">01 dec</h5>
+                    <img src="" class="forecast-item-img" width="120px" height="120px">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">01 dec</h5>
+                    <img src="" class="forecast-item-img" width="120px" height="120px">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">01 dec</h5>
+                    <img src="" class="forecast-item-img" width="120px" height="120px">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">01 dec</h5>
+                    <img src="" class="forecast-item-img" width="120px" height="120px">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+                <div class="forecast-item">
+                    <h5 class="forecast-item-date regular-txt">01 dec</h5>
+                    <img src="" class="forecast-item-img" width="120px" height="120px">
+                    <h5 class="forecast-item-temp">29 °C</h5>
+                </div>
+            </div>
+        </section>
+       <section class="search-city section-message">
+            <img class="message-img" src="search city.png" alt="">
+            <div>
+                <h1>search city</h1>
+                <h4 class="regular-txt">find out the weather condition of the city</h4>
+            </div>
+        </section>
+        <section class="not-found section-message" style="display: none;">
+            <div>
+                <h1>city not found</h1>
+                <h4 class="regular-txt">try finding another the city</h4>
+            </div>
+        </section>
+    </main>
+</body>
+<script>
+    // Sélection des éléments DOM
+const cityInput = document.querySelector('.city-input');
+const searchBtn = document.querySelector('.search-btn');
+const weatherInfoSection = document.querySelector('.weather-info');
+const notFoundSection = document.querySelector('.not-found');
+const searchCitySection = document.querySelector('.search-city');
+const countryTxt = document.querySelector('.country-txt');
+const tempTxt = document.querySelector('.temp-txt');
+const conditionTxt = document.querySelector('.condition-txt');
+const humidityValueTxt = document.querySelector('.humidity-value-txt');
+const windValueTxt = document.querySelector('.wind-value-txt');
+const weatherSummaryImg = document.querySelector('.weather-summary-img');
+const currentDateTxt = document.querySelector('.current-date-txt');
+const forecastItemsContainer = document.querySelector('.forecast-items-container');
+
+// Clé API OpenWeather
+const apiKey = "aa9010320679c4aef480e9cd3803fd94";
+
+// Gestionnaire d'événements pour le bouton de recherche
+searchBtn.addEventListener('click', () => {
+    if (cityInput.value.trim() !== '') {
+        updateWeatherInfo(cityInput.value);
+        cityInput.value = '';
+        cityInput.blur();
+    }
+});
+
+// Gestionnaire d'événements pour appuyer sur la touche "Entrée"
+cityInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && cityInput.value.trim() !== '') {
+        updateWeatherInfo(cityInput.value);
+        cityInput.value = '';
+        cityInput.blur();
+    }
+});
+
+// Récupération des données de l'API
+async function getFetchData(endpoint, city) {
+    const apiUrl = `https://api.openweathermap.org/data/2.5/${endpoint}?q=${city}&appid=${apiKey}&units=metric`;
+    const response = await fetch(apiUrl);
+    return response.json();
+}
+
+// Obtenir l'icône météo selon l'ID en utilisant des liens d'images
+function getWeatherIcon(id) {
+    if (id <= 232) return 'https://openweathermap.org/img/wn/11d.png'; // Thunderstorm
+    if (id <= 321) return 'https://openweathermap.org/img/wn/09d.png'; // Drizzle
+    if (id <= 531) return 'https://openweathermap.org/img/wn/10d.png'; // Rain
+    if (id <= 622) return 'https://openweathermap.org/img/wn/13d.png'; // Snow
+    if (id <= 781) return 'https://openweathermap.org/img/wn/50d.png'; // Atmosphere
+    if (id === 800) return 'https://openweathermap.org/img/wn/01d.png'; // Clear
+    return 'https://openweathermap.org/img/wn/04d.png'; // Clouds
+}
+
+// Obtenir la date actuelle au format "Jour, Date Mois"
+function getCurrentDate() {
+    const currentDate = new Date();
+    const options = {
+        weekday: 'short',
+        day: '2-digit',
+        month: 'short',
+    };
+    return currentDate.toLocaleDateString('en-GB', options);
+}
+
+// Mettre à jour les informations météo
+async function updateWeatherInfo(city) {
+    const weatherData = await getFetchData('weather', city);
+
+    if (weatherData.cod !== 200) {
+        // Si la ville n'est pas trouvée, affiche une alerte
+        alert('Ville non trouvée');
+        showDisplaySection(notFoundSection);
+        return;
+    }
+
+    const {
+        name: country,
+        main: { temp, humidity },
+        weather: [{ id, main }],
+        wind: { speed },
+    } = weatherData;
+
+    countryTxt.textContent = country;
+    tempTxt.textContent = `${Math.round(temp)} °C`;
+    conditionTxt.textContent = main;
+    humidityValueTxt.textContent = `${humidity}%`;
+    windValueTxt.textContent = `${speed} M/s`;
+    currentDateTxt.textContent = getCurrentDate();
+    weatherSummaryImg.src = getWeatherIcon(id);
+
+    await updateForecastsInfo(city);
+    showDisplaySection(weatherInfoSection);
+}
+
+// Mettre à jour les prévisions météo
+async function updateForecastsInfo(city) {
+    const forecastsData = await getFetchData('forecast', city);
+    const timeTaken = '12:00:00';
+    const todayDate = new Date().toISOString().split('T')[0];
+
+    forecastItemsContainer.innerHTML = ''; // Réinitialiser les prévisions
+
+    forecastsData.list.forEach((forecastWeather) => {
+        if (
+            forecastWeather.dt_txt.includes(timeTaken) &&
+            !forecastWeather.dt_txt.includes(todayDate)
+        ) {
+            updateForecastItems(forecastWeather);
+        }
+    });
+}
+
+// Mettre à jour un élément de prévision
+function updateForecastItems(weatherData) {
+    const {
+        dt_txt: date,
+        weather: [{ id }],
+        main: { temp },
+    } = weatherData;
+
+    const dateTaken = new Date(date);
+    const dateOptions = { day: '2-digit', month: 'short' };
+    const dateResult = dateTaken.toLocaleDateString('en-GB', dateOptions);
+
+    const forecastItem = `
+        <div class="forecast-item">
+            <h5 class="forecast-item-date regular-txt">${dateResult}</h5>
+            <img src="${getWeatherIcon(id)}" class="forecast-item-img" width="120px" height="120px">
+            <h5 class="forecast-item-temp">${Math.round(temp)} °C</h5>
+        </div>
+    `;
+
+    forecastItemsContainer.insertAdjacentHTML('beforeend', forecastItem);
+}
+
+// Afficher une section et masquer les autres
+function showDisplaySection(section) {
+    [weatherInfoSection, searchCitySection, notFoundSection].forEach((sec) => {
+        sec.style.display = 'none';
+    });
+    section.style.display = 'flex';
+}
+
+</script>
+</html>
